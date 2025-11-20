@@ -1,0 +1,40 @@
+{
+  "name": "tli-bot",
+  "version": "1.0.0",
+  "description": "The Discord bot for The Lost Isles",
+  "keywords": [
+    "tli",
+    "the",
+    "lost",
+    "isles",
+    "discord",
+    "bot"
+  ],
+  "homepage": "https://github.com/MCD-Team/TLI-Bot#readme",
+  "bugs": {
+    "url": "https://github.com/MCD-Team/TLI-Bot/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MCD-Team/TLI-Bot.git"
+  },
+  "license": "MIT",
+  "author": "uitgeteld & robingroeneveld",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsup src/index.ts --minify"
+  },
+  "dependencies": {
+    "discord.js": "^14.25.0",
+    "dotenv": "^17.2.3"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
