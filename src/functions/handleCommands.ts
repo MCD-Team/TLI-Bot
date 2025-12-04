@@ -1,26 +1,44 @@
 import { Client, Collection, REST, Routes } from "discord.js";
 import fs from "node:fs";
 import path from "node:path";
-import { pathToFileURL } from "url";
 import { config } from "../config";
+import { loadModule } from "../helpers/loadModule";
 
-export async function handleCommands(client: Client, commandsPath: string) {
+export default async function handleCommands(client: Client, commandsPath: string) {
   client.commands = new Collection();
   const commandFolders = fs.readdirSync(commandsPath);
   const commandArray: any[] = [];
 
   for (const folder of commandFolders) {
     const folderPath = path.join(commandsPath, folder);
-    const commandFiles = fs.readdirSync(folderPath).filter(file => file.endsWith(".ts"));
+    const commandFiles = fs.readdirSync(folderPath).filter(file => file.endsWith(".ts") || file.endsWith(".js"));
     for (const file of commandFiles) {
-      const commandModule = await import(pathToFileURL(path.join(folderPath, file)).href);
+      const filePath = path.join(folderPath, file);
+      const commandModule = await loadModule(filePath);
       const command = commandModule.default || commandModule;
+      
       client.commands.set(command.data.name, command);
       commandArray.push(command.data.toJSON());
+      
+      if (command.aliases && Array.isArray(command.aliases)) {
+        for (const alias of command.aliases) {
+          const aliasData = new (command.data.constructor)()
+            .setName(alias)
+            .setDescription(`Alias for /${command.data.name}`);
+          if (command.data.options) {
+            command.data.options.forEach((option: any) => {
+              aliasData.options.push(option);
+            });
+          }
+          
+          client.commands.set(alias, command);
+          commandArray.push(aliasData.toJSON());
+        }
+      }
     }
   }
-
   const rest = new REST({ version: "10" }).setToken(config.TOKEN);
+  
   try {
     console.log("Started refreshing application (/) commands.");
     await rest.put(
